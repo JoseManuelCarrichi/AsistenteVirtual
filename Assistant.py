@@ -3,6 +3,7 @@ from LogicEngine import ModelInference
 from LogicEngine import loadModel
 from tts import text_to_speech
 from tts import load_tts
+from whisperstt import transcription_function
 
 import time
 
@@ -21,27 +22,36 @@ class Assistant:
         self.speed = voice_speed
         self.tts = ""
 
+
     def load(self):
         self.LLM = loadModel(self.model_name, self.model_path)
         self.tts = load_tts(self.model_voice_name)
+        self.whisper_stt = transcription_function()
 
     def listen(self):
-        try:
+        '''try:
             self.user_question = input("Escribe una pregunta: ")
         except:
-            print("Ocurrio un error al procesar la pregunta escrita.")
+            print("Ocurrio un error al procesar la pregunta escrita.")'''
+        # self.user_question = trasncript("instruccion.wav")
+        try:
+            self.user_question = self.whisper_stt.whisper_listen()
+        except:
+            print("Ocurrio un error al transcribir la instruccionde voz")
+        
 
     def think(self):
-        print(f"Pregunta leida: {self.user_question}")
-        self.answer = ModelInference(self.LLM,self.user_question)
-        print(self.answer)
-        '''try:
-            print(self.user_question)
-            self.answer = ModelInference(self.user_question)
+        try:
+            print(f"Pregunta leida: {self.user_question}")
+            self.answer = ModelInference(self.LLM,self.user_question)
             print(self.answer)
         except:
-            print("No entendi tu pregunta")'''
+            print("Ocurrio un error al generar la respuesta")
+        
 
     def speak(self):
-        text_to_speech(self.tts,self.answer,self.file_path,self.speed)
+        try:
+            text_to_speech(self.tts,self.answer,self.file_path,self.speed)
+        except:
+            print("Ocurrio un error al generar la respuesta por voz")
         

@@ -13,9 +13,9 @@ file_path = "output.wav"
 
 
 robotito = Assistant(model_name, model_path, max_tokens, temperature, model_voice_name, file_path, voice_speed)
+robotito.load()
 
 while(True):
-    robotito.load()
     robotito.listen()
     robotito.think()
     robotito.speak()
