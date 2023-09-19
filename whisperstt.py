@@ -4,25 +4,11 @@ from queue import Queue
 from datetime import datetime, timedelta
 from tempfile import NamedTemporaryFile
 import io
-'''
-def trasncript(file_name):
-    wake_word = "Atomo"
-    model = whisper.load_model("base")
-    result = model.transcribe(file_name)
-    print(result["text"])
 
-    if wake_word in result["text"]:
-        prompt = result["text"].replace(wake_word+", ", "")
-        print(f"Promt final: {prompt}")
-        return prompt
-    else:
-        print("No encontre la frase")
-        return "Hola"
-
-'''
 class transcription_function():
     def __init__(self):
-        self.wake_word = ["atom", "¡atom!", "¿atom?", "atomo", "a tom"]
+        #self.wake_word = ["atom", "¡atom!", "¿atom?", "atomo", "a tom"]
+        self.wake_word = ["zara", "¡zara!", "¿zara?", "sara", "¡sara!", "¿sara?"]
         self.model = whisper.load_model("base")
         self.transcription = [""]
         self.record_timeout = 3
@@ -38,7 +24,9 @@ class transcription_function():
         self.temp_file = NamedTemporaryFile().name
         
     def whisper_listen(self):
-        # Tasa de muestreo en 16 KHz
+        self.data_queue = Queue()
+        self.transcription = [""]
+        # self.dataa de muestreo en 16 KHz
         self.source = sr.Microphone(sample_rate=16000)
         with self.source:
             # Se ajusta el nivel de ruido ambiente para que no se tome como voz
@@ -60,6 +48,7 @@ class transcription_function():
                 # Se escribe la transcripción cada 8 segundos
                 if ((now - start).total_seconds()%8) == 0:
                     #print("Entro a escribir el trasncrit")
+                    print("Escuchando...")
                     print(self.transcription)
                     #print("Salgo de imprimir")
                 # Se verifica si hay nuevos datos de audio en la cola thread-safe
@@ -92,20 +81,13 @@ class transcription_function():
                     else:
                         self.transcription[-1] = text
                     # Si la palabra clave ("wake word") se encuentra en la última transcripción, se activa el asistente virtual.
-                    for i in range (5):
+                    for i in range (6):
                         if self.wake_word[i] in self.transcription[-1].lower():
                             print("Encontre la palabra :)")
                             prompt = self.transcription[-1].lower().replace(self.wake_word[i],"").replace(",", "").strip()
                             print("USER: ",prompt)
                             self.transcription = [""]
                             return prompt       
-                            
-                            
+                                                            
             except KeyboardInterrupt:
                 break
-    
-
-'''listener = transcription_function()
-frase = listener.listen()
-
-print(f"La frase es: {frase}")'''
